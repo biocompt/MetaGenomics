@@ -45,5 +45,19 @@ usearch -sortbylength $ZOTUS/ZOTUS.fa -minseqlength 175 -fastaout $ZOTUS/SORTED_
 ```
 Now we are ready to run the metagenomic analysis.
 ### 3. Run the metagenomic analysis
-
-
+In this step we proceed to identified the species in our sample, or at least, the gender/family of the micro-organism that we could not identified. First, we clusterized the zotus to minimize memory use.
+```
+usearch -cluster_smallmem $ZOTUS/SORTED_ZOTUS.fa -id 0.99 -centroids $ZOTUS/ZOTUS_99.fa
+```
+Then, we create the OTU table to which map our reads to each of the clustered zotus.
+```
+usearch -otutab $MERGED/$TRUNCATED.fastq -otus $ZOTUS/ZOTUS_99.fa -id 0.97 -otutabout $RESULTS/$OTU_TAB.tsv
+```
+Now, we are ready to identify the microorganism by blasting our sample with a specific database. This database must be downloaded or created with the microorganisms typical of the environment we are studying.
+```
+usearch -usearch_local $ZOTUS/ZOTUS_99.fa  -db $SPECIFIC_DATABASE -id 0.95 -notmatched $ZOTUS/$ZOTUS_NOT_MATCHED.fa  -strand both -top_hit_only -query_cov 0.90
+```
+Those samples that could not be identified by specific database, are blasted with a more general database.
+```
+usearch -sintax $ZOTUS/$ZOTUS_NOT_MATCHED.fa -db $SYNTAX_DATABASE -strand both -tabbedout $RESULTS/$NOT_MATCHED_PREDICTIONS.tsv -sintax_cutoff 0.97
+```
