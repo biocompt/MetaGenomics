@@ -1,7 +1,7 @@
 # MetaGenomics
 
 
-### QC of the samples
+### 1. QC of the samples
 The downloaded samples must be processed to ensure data quality. A quality control analysis should be performed to filter out those samples that do not exceed the minimum quality parameters. ***FastQC*** analyzes each FASTQ file, while ***MultiQC*** creates a global report of all analyzed files, giving us a very intuitive and easy-to-analyze output.
 ```
 fastqc $file --noextract --t 4 --o $QC/
@@ -16,4 +16,23 @@ We then reanalyzed these filtered samples to ensure correct sample processing.
 ```
 fastqc $file --noextract --t 4 --o $QC_FILTERED/
 multiqc $QC_FILTERED/ -o $QC_FILTERED/Report/
+```
+### 2. Merge samples and keep the uniques
+In this step, the end-of-pair samples are merged, filtering by a minimum length and eliminating duplicate sequences, keeping only the non-repetitive sequences. So, to merge we only have to specify the R1 files and usearch will search for their pair.
+```
+usearch -fastq_mergepairs $SAMPLE_R1 -maxdiffs 20 -fastqout $MERGED/MERGED_SAMPLES.fastq
+```
+*If samples are single end, we can join all of them in one file*
+
+### 2 - Create the report
+~/usearch -fastx_info Merged/merged.fastq -output Merged/Stats_merge.txt
+
+### 3 - Remove primers of amplification
+~/usearch -fastx_truncate Merged/merged.fastq -stripleft 20 -stripright 20 -fastqout Merged/truncated.fastq
+
+### 4 - Filter the samples
+~/usearch -fastq_filter Merged/truncated.fastq -fastaout Merged/filtered.fa -relabel filt -fastq_maxee 1 -fastq_minlen 200
+
+### 5 - Stay with the uniques
+~/usearch -fastx_uniques Merged/filtered.fa -fastaout Merged/uniques.fasta -sizeout -relabel Uniq -strand both
 ```
