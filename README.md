@@ -20,19 +20,19 @@ multiqc $QC_FILTERED/ -o $QC_FILTERED/Report/
 ### 2. Merge samples and keep the uniques
 In this step, the end-of-pair samples are merged, filtering by a minimum length and eliminating duplicate sequences, keeping only the non-repetitive sequences. So, to merge we only have to specify the R1 files and usearch will search for their pair.
 ```
-usearch -fastq_mergepairs $SAMPLE_R1 -maxdiffs 20 -fastqout $MERGED/MERGED_SAMPLES.fastq
+usearch -fastq_mergepairs $SAMPLE_R1 -maxdiffs $MAX_DIFF -fastqout $MERGED/MERGED_SAMPLES.fastq
 ```
 *If samples are single end, we can join all of them in one file*
-
-### 2 - Create the report
-~/usearch -fastx_info Merged/merged.fastq -output Merged/Stats_merge.txt
-
-### 3 - Remove primers of amplification
-~/usearch -fastx_truncate Merged/merged.fastq -stripleft 20 -stripright 20 -fastqout Merged/truncated.fastq
-
-### 4 - Filter the samples
-~/usearch -fastq_filter Merged/truncated.fastq -fastaout Merged/filtered.fa -relabel filt -fastq_maxee 1 -fastq_minlen 200
-
-### 5 - Stay with the uniques
-~/usearch -fastx_uniques Merged/filtered.fa -fastaout Merged/uniques.fasta -sizeout -relabel Uniq -strand both
+*It is recommended to create a report of the merge, as well as of any step, to follow all the steps and ensure the quality of the analysis (--fastx_info to create the report)*
+Once the samples have been merged into a single file, the amplification primers are removed. These primers are usually 20 base pairs upstream and downstream.
+```
+usearch -fastx_truncate $MERGED/MERGED_SAMPLES.fastq -stripleft 20 -stripright 20 -fastqout $MERGED/$TRUNCATED.fastq
+```
+After that, we filter the samples by a minimum length. This value depends on the mean length of our samples.
+```
+usearch -fastq_filter $MERGED/$TRUNCATED.fastq -relabel filt -fastq_minlen $ACCEPTABLE_MIN_LENGTH -fastaout $MERGED/$FILTERED.fa
+```
+Last, we just keep unique sequences.
+```
+usearch -fastx_uniques $MERGED/$FILTERED.fa -sizeout -relabel Uniq -strand both -fastaout $MERGED/$UNIQUES.fasta
 ```
