@@ -61,3 +61,5 @@ Those samples that could not be identified by specific database, are blasted wit
 ```
 usearch -sintax $ZOTUS/$ZOTUS_NOT_MATCHED.fa -db $SYNTAX_DATABASE -strand both -tabbedout $RESULTS/$NOT_MATCHED_PREDICTIONS.tsv -sintax_cutoff 0.97
 ```
+### 3. BLAST with ONLINE DATABASES
+It is advisable to analyze those samples that have been identified to family/gene level in online databases such as NCBI, uploading our sequence to the web and doing BLAST with specific 16S RNA databases (rRNA/ITS databases).
