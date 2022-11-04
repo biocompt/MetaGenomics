@@ -31,7 +31,19 @@ After that, we filter the samples by a minimum length. This value depends on the
 ```
 usearch -fastq_filter $MERGED/$TRUNCATED.fastq -relabel filt -fastq_minlen $ACCEPTABLE_MIN_LENGTH -fastaout $MERGED/$FILTERED.fa
 ```
-Last, we just keep unique sequences.
+Then, we just keep unique sequences.
 ```
 usearch -fastx_uniques $MERGED/$FILTERED.fa -sizeout -relabel Uniq -strand both -fastaout $MERGED/$UNIQUES.fasta
 ```
+We de-noise these unique sequences, removing chimeras and correcting reads with sequencing errors.
+```
+usearch -unoise3 $MERGED/$UNIQUES.fasta -zotus $ZOTUS/ZOTUS.fa
+```
+And, lastly, we sort the zotus by length and applied a second filtering by minimum sequence length.
+```
+usearch -sortbylength $ZOTUS/ZOTUS.fa -minseqlength 175 -fastaout $ZOTUS/SORTED_ZOTUS.fa
+```
+Now we are ready to run the metagenomic analysis.
+### 3. Run the metagenomic analysis
+
+
