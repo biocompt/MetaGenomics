@@ -22,8 +22,7 @@ In this step, the end-of-pair samples are merged, filtering by a minimum length 
 ```
 usearch -fastq_mergepairs $SAMPLE_R1 -maxdiffs $MAX_DIFF -fastqout $MERGED/MERGED_SAMPLES.fastq
 ```
-*If samples are single end, we can join all of them in one file*
-*It is recommended to create a report of the merge, as well as of any step, to follow all the steps and ensure the quality of the analysis (--fastx_info to create the report)*
+*If samples are single end, we can join all of them in one file*. Besides, *it is recommended to create a report of the merge, as well as of any step, to follow all the steps and ensure the quality of the analysis (--fastx_info to create the report)*
 Once the samples have been merged into a single file, the amplification primers are removed. These primers are usually 20 base pairs upstream and downstream.
 ```
 usearch -fastx_truncate $MERGED/MERGED_SAMPLES.fastq -stripleft 20 -stripright 20 -fastqout $MERGED/$TRUNCATED.fastq
